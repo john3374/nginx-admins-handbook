@@ -1,31 +1,31 @@
-# 구성 예제
+# Configuration Examples
 
-Go back to the **[⬆ 목차](https://github.com/dhtmdgkr123/nginx-admins-handbook#table-of-contents)** or **[⬆ What's next?](https://github.com/dhtmdgkr123/nginx-admins-handbook#whats-next)** section.
+Go back to the **[⬆ Table of Contents](https://github.com/trimstray/nginx-admins-handbook#table-of-contents)** or **[⬆ What's next?](https://github.com/trimstray/nginx-admins-handbook#whats-next)** section.
 
-- **[≡ 구성 예제](#examples)**
-  * [역프록시](#역프록시)
-    * [설치](#설치)
-    * [구성](#구성)
-    * [구성 가져오기](#구성-가져오기)
-    * [IP주소 지정](#ip주소-지정)
-    * [도메인 이름 구성](#도메인-이름-구성)
-    * [개인키와 인증서 생성](#개인키와-인증서-생성)
-    * [모듈 목록 업데이트](#모듈-목록-업데이트)
-    * [에러페이지 생성](#에러페이지-생성)
-    * [새 도메인 추가](#새-도메인-추가)
-    * [구성 테스트](#구성-테스트)
+- **[≡ Configuration Examples](#examples)**
+  * [Reverse Proxy](#reverse-proxy)
+    * [Installation](#installation)
+    * [Configuration](#configuration)
+    * [Import configuration](#import-configuration)
+    * [Set bind IP address](#set-bind-ip-address)
+    * [Set your domain name](#set-your-domain-name)
+    * [Regenerate private keys and certs](#regenerate-private-keys-and-certs)
+    * [Update modules list](#update-modules-list)
+    * [Generating the necessary error pages](#generating-the-necessary-error-pages)
+    * [Add new domain](#add-new-domain)
+    * [Test your configuration](#test-your-configuration)
 
-  > 구성과 파일들을 백업하는걸 잊지 마세요.
+  > Remember to make a copy of the current configuration and all files/directories.
 
-이 부분은 아직 작업중입니다.
+This chapter is still work in progress.
 
-## 설치
+## Installation
 
-[소스에서 설치](HELPERS.md#소스에서-설치)
+I used step-by-step tutorial from this handbook [Installing from source](HELPERS.md#installing-from-source).
 
-## 구성
+## Configuration
 
-다음 매개변수와 함께 Google Cloud 인스턴스를 사용:
+I used Google Cloud instance with following parameters:
 
 | <b>ITEM</b> | <b>VALUE</b> | <b>COMMENT</b> |
 | :---         | :---         | :---         |
@@ -35,52 +35,52 @@ Go back to the **[⬆ 목차](https://github.com/dhtmdgkr123/nginx-admins-handbo
 | HTTP | Varnish on port 80 | |
 | HTTPS | NGINX on port 443 | |
 
-## 역프록시
+## Reverse Proxy
 
-이 장에서는 내 프록시 서버의 기본 구성에 대해 설명합니다. ([blkcipher.info](https://blkcipher.info) 도메인).
+This chapter describes the basic configuration of my proxy server (for [blkcipher.info](https://blkcipher.info) domain).
 
-  > 구성은 [소스에서 설치](HELPERS.md#소스에서-설치)장을 기반으로 합니다. [소스에서 설치](HELPERS.md#소스에서-설치)를 따라하셨으면 아래에 나오는 구성을 그대로 쓰실 수 있습니다. (약간의 조정이 필요할 수 있습니다)
+  > Configuration is based on the [installation from source](HELPERS.md#installing-from-source) chapter. If you go through the installation process step by step you can use the following configuration (minor adjustments may be required).
 
-#### 구성 가져오기
+#### Import configuration
 
-매우 간단합니다 - 저장소 복제, 현재 구성 백업 그리고 전체 동기화:
+It's very simple - clone the repo, backup your current configuration and perform full directory sync:
 
 ```bash
-git clone https://github.com/dhtmdgkr123/nginx-admins-handbook
+git clone https://github.com/trimstray/nginx-admins-handbook
 
 tar czvfp ~/nginx.etc.tgz /etc/nginx && mv /etc/nginx /etc/nginx.old
 
 rsync -avur lib/nginx/ /etc/nginx/
 ```
 
-  > NGINX를 컴파일 하셨다면 모듈들을 업데이트/새로고침 해야합니다. 컴파일된 모듈들은 이곳에 `/usr/local/src/nginx-${ngx_version}/master/objs` 저장되고 `--modules-path` 값에 따라 설치됩니다.
+  > If you compiled NGINX from source you should also update/refresh modules. All compiled modules are stored in `/usr/local/src/nginx-${ngx_version}/master/objs` and installed in accordance with the value of the `--modules-path` variable.
 
-#### IP주소 지정
+#### Set bind IP address
 
-###### 파일과 폴더 이름에서 '192.168.252.2' 찾기 및 바꾸기
+###### Find and replace 192.168.252.2 string in directory and file names
 
 ```bash
 cd /etc/nginx
 find . -depth -not -path '*/\.git*' -name '*192.168.252.2*' -execdir bash -c 'mv -v "$1" "${1//192.168.252.2/xxx.xxx.xxx.xxx}"' _ {} \;
 ```
 
-###### 구성파일에서 '192.168.252.2' 찾기 및 바꾸기
+###### Find and replace 192.168.252.2 string in configuration files
 
 ```bash
 cd /etc/nginx
 find . -not -path '*/\.git*' -type f -print0 | xargs -0 sed -i 's/192.168.252.2/xxx.xxx.xxx.xxx/g'
 ```
 
-#### 도메인 이름 구성
+#### Set your domain name
 
-###### 파일과 폴더 이름에서 'blkcipher.info' 찾기 및 바꾸기
+###### Find and replace blkcipher.info string in directory and file names
 
 ```bash
 cd /etc/nginx
 find . -not -path '*/\.git*' -depth -name '*blkcipher.info*' -execdir bash -c 'mv -v "$1" "${1//blkcipher.info/example.com}"' _ {} \;
 ```
 
-###### 구성파일에서 'blkcipher.info' 찾기 및 바꾸기
+###### Find and replace blkcipher.info string in configuration files
 
 ```bash
 cd /etc/nginx
@@ -88,49 +88,49 @@ find . -not -path '*/\.git*' -type f -print0 | xargs -0 sed -i 's/blkcipher_info
 find . -not -path '*/\.git*' -type f -print0 | xargs -0 sed -i 's/blkcipher.info/example.com/g'
 ```
 
-#### 개인키와 인증서 생성
+#### Regenerate private keys and certs
 
-###### 로컬호스트용
+###### For localhost
 
 ```bash
 cd /etc/nginx/master/_server/localhost/certs
 
-# 개인키와 자체 서명 인증서:
+# Private key + Self-signed certificate:
 ( _fd="localhost.key" ; _fd_crt="nginx_localhost_bundle.crt" ; \
 openssl req -x509 -newkey rsa:2048 -keyout ${_fd} -out ${_fd_crt} -days 365 -nodes \
 -subj "/C=X0/ST=localhost/L=localhost/O=localhost/OU=X00/CN=localhost" )
 ```
 
-###### 'default_server` 기본 서버용
+###### For `default_server`
 
 ```bash
 cd /etc/nginx/master/_server/defaults/certs
 
-# 개인키와 자체 서명 인증서:
+# Private key + Self-signed certificate:
 ( _fd="defaults.key" ; _fd_crt="nginx_defaults_bundle.crt" ; \
 openssl req -x509 -newkey rsa:2048 -keyout ${_fd} -out ${_fd_crt} -days 365 -nodes \
 -subj "/C=X1/ST=default/L=default/O=default/OU=X11/CN=default_server" )
 ```
 
-###### 도메인용 (예. Let's Encrypt)
+###### For your domain (e.g. Let's Encrypt)
 
 ```bash
 cd /etc/nginx/master/_server/example.com/certs
 
-# 다중 도메인:
+# For multidomain:
 certbot certonly -d example.com -d www.example.com --rsa-key-size 2048
 
-# 와일드카드 서브 도메인:
+# For wildcard:
 certbot certonly --manual --preferred-challenges=dns -d example.com -d *.example.com --rsa-key-size 2048
 
-# 개인키와 인증서체인 복사:
+# Copy private key and chain:
 cp /etc/letsencrypt/live/example.com/fullchain.pem nginx_example.com_bundle.crt
 cp /etc/letsencrypt/live/example.com/privkey.pem example.com.key
 ```
 
-#### 모듈 목록 업데이트
+#### Update modules list
 
-모듈 목록을 업데이트하고 구성에 `modules.conf` 파일을 포함합니다:
+Update modules list and include `modules.conf` to your configuration:
 
 ```bash
 _mod_dir="/etc/nginx/modules"
@@ -140,7 +140,7 @@ _mod_dir="/etc/nginx/modules"
 for _module in $(ls "${_mod_dir}/") ; do echo -en "load_module\t\t${_mod_dir}/$_module;\n" >> "${_mod_dir}.conf" ; done
 ```
 
-#### 에러페이지 생성
+#### Generating the necessary error pages
 
   > In the example (`lib/nginx`) error pages are included from `lib/nginx/master/_static/errors.conf` file.
 
@@ -154,14 +154,14 @@ for _module in $(ls "${_mod_dir}/") ; do echo -en "load_module\t\t${_mod_dir}/$_
 
   ./httpgen
 
-  # sites/ 디렉터리를 /etc/nginx/html 디렉터리와 동기화 할 수 있습니다:
+  # You can also sync sites/ directory with /etc/nginx/html:
   #   rsync -var sites/ /etc/nginx/html/
   rsync -var sites/ /usr/share/www/
   ```
 
-#### 새 도메인 추가
+#### Add new domain
 
-###### `nginx.conf` 업데이트
+###### Updated `nginx.conf`
 
 ```nginx
 # At the end of the file (in 'IPS/DOMAINS' section):
@@ -169,7 +169,7 @@ include /etc/nginx/master/_server/domain.com/servers.conf;
 include /etc/nginx/master/_server/domain.com/backends.conf;
 ```
 
-###### 도메인 디렉터리 초기 설정
+###### Init domain directory
 
 ```bash
 cd /etc/nginx/cd master/_server
@@ -181,7 +181,7 @@ find . -not -path '*/\.git*' -type f -print0 | xargs -0 sed -i 's/example_com/do
 find . -not -path '*/\.git*' -type f -print0 | xargs -0 sed -i 's/example.com/domain.com/g'
 ```
 
-#### 로그 디렉터리 생성
+#### Create log directories
 
 ```bash
 mkdir -p /var/log/nginx/localhost
@@ -192,13 +192,13 @@ mkdir -p /var/log/nginx/domains/blkcipher.info
 chown -R nginx:nginx /var/log/nginx
 ```
 
-#### 로그순환 구성
+#### Logrotate configuration
 
 ```bash
 cp /etc/nginx/snippets/logrotate.d/nginx /etc/logrotate.d/
 ```
 
-#### 구성 테스트
+#### Test your configuration
 
 ```bash
 nginx -t -c /etc/nginx/nginx.conf
