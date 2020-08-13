@@ -1,21 +1,21 @@
-# 구성 예제
+# 설정 예제
 
 Go back to the **[⬆ 목차](https://github.com/dhtmdgkr123/nginx-admins-handbook#table-of-contents)** or **[⬆ What's next?](https://github.com/dhtmdgkr123/nginx-admins-handbook#whats-next)** section.
 
-- **[≡ 구성 예제](#examples)**
+- **[≡ 설정 예제](#examples)**
   * [역프록시](#역프록시)
     * [설치](#설치)
-    * [구성](#구성)
-    * [구성 가져오기](#구성-가져오기)
+    * [설정](#설정)
+    * [설정 가져오기](#설정-가져오기)
     * [IP주소 지정](#ip주소-지정)
-    * [도메인 이름 구성](#도메인-이름-구성)
+    * [도메인 이름 설정](#도메인-이름-설정)
     * [개인키와 인증서 생성](#개인키와-인증서-생성)
     * [모듈 목록 업데이트](#모듈-목록-업데이트)
     * [에러페이지 생성](#에러페이지-생성)
     * [새 도메인 추가](#새-도메인-추가)
-    * [구성 테스트](#구성-테스트)
+    * [설정 테스트](#설정-테스트)
 
-  > 구성과 파일들을 백업하는걸 잊지 마세요.
+  > 설정과 파일들을 백업하는걸 잊지 마세요.
 
 이 부분은 아직 작업중입니다.
 
@@ -23,7 +23,7 @@ Go back to the **[⬆ 목차](https://github.com/dhtmdgkr123/nginx-admins-handbo
 
 [소스에서 설치](HELPERS.md#소스에서-설치)
 
-## 구성
+## 설정
 
 다음 매개변수와 함께 Google Cloud 인스턴스를 사용:
 
@@ -37,13 +37,13 @@ Go back to the **[⬆ 목차](https://github.com/dhtmdgkr123/nginx-admins-handbo
 
 ## 역프록시
 
-이 장에서는 내 프록시 서버의 기본 구성에 대해 설명합니다. ([blkcipher.info](https://blkcipher.info) 도메인).
+이 장에서는 내 프록시 서버의 기본 설정에 대해 설명합니다. ([blkcipher.info](https://blkcipher.info) 도메인).
 
-  > 구성은 [소스에서 설치](HELPERS.md#소스에서-설치)장을 기반으로 합니다. [소스에서 설치](HELPERS.md#소스에서-설치)를 따라하셨으면 아래에 나오는 구성을 그대로 쓰실 수 있습니다. (약간의 조정이 필요할 수 있습니다)
+  > 설정은 [소스에서 설치](HELPERS.md#소스에서-설치)장을 기반으로 합니다. [소스에서 설치](HELPERS.md#소스에서-설치)를 따라하셨으면 아래에 나오는 설정을 그대로 쓰실 수 있습니다. (약간의 조정이 필요할 수 있습니다)
 
-#### 구성 가져오기
+#### 설정 가져오기
 
-매우 간단합니다 - 저장소 복제, 현재 구성 백업 그리고 전체 동기화:
+매우 간단합니다 - 저장소 복제, 현재 설정 백업 그리고 전체 동기화:
 
 ```bash
 git clone https://github.com/dhtmdgkr123/nginx-admins-handbook
@@ -64,14 +64,14 @@ cd /etc/nginx
 find . -depth -not -path '*/\.git*' -name '*192.168.252.2*' -execdir bash -c 'mv -v "$1" "${1//192.168.252.2/xxx.xxx.xxx.xxx}"' _ {} \;
 ```
 
-###### 구성파일에서 '192.168.252.2' 찾기 및 바꾸기
+###### 설정파일에서 '192.168.252.2' 찾기 및 바꾸기
 
 ```bash
 cd /etc/nginx
 find . -not -path '*/\.git*' -type f -print0 | xargs -0 sed -i 's/192.168.252.2/xxx.xxx.xxx.xxx/g'
 ```
 
-#### 도메인 이름 구성
+#### 도메인 이름 설정
 
 ###### 파일과 폴더 이름에서 'blkcipher.info' 찾기 및 바꾸기
 
@@ -80,7 +80,7 @@ cd /etc/nginx
 find . -not -path '*/\.git*' -depth -name '*blkcipher.info*' -execdir bash -c 'mv -v "$1" "${1//blkcipher.info/example.com}"' _ {} \;
 ```
 
-###### 구성파일에서 'blkcipher.info' 찾기 및 바꾸기
+###### 설정파일에서 'blkcipher.info' 찾기 및 바꾸기
 
 ```bash
 cd /etc/nginx
@@ -130,7 +130,7 @@ cp /etc/letsencrypt/live/example.com/privkey.pem example.com.key
 
 #### 모듈 목록 업데이트
 
-모듈 목록을 업데이트하고 구성에 `modules.conf` 파일을 포함합니다:
+모듈 목록을 업데이트하고 설정에 `modules.conf` 파일을 포함합니다:
 
 ```bash
 _mod_dir="/etc/nginx/modules"
@@ -192,13 +192,13 @@ mkdir -p /var/log/nginx/domains/blkcipher.info
 chown -R nginx:nginx /var/log/nginx
 ```
 
-#### 로그순환 구성
+#### 로그순환 설정
 
 ```bash
 cp /etc/nginx/snippets/logrotate.d/nginx /etc/logrotate.d/
 ```
 
-#### 구성 테스트
+#### 설정 테스트
 
 ```bash
 nginx -t -c /etc/nginx/nginx.conf
