@@ -101,7 +101,7 @@ openssl req -x509 -newkey rsa:2048 -keyout ${_fd} -out ${_fd_crt} -days 365 -nod
 -subj "/C=X0/ST=localhost/L=localhost/O=localhost/OU=X00/CN=localhost" )
 ```
 
-###### 'default_server` 기본 서버용
+###### `default_server` 기본 서버용
 
 ```bash
 cd /etc/nginx/master/_server/defaults/certs
